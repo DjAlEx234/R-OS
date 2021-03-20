@@ -30,6 +30,19 @@ void splashscreen()
     text_prints(cpuid_string());
     text_setfgbg(15, 4);
 }
+void keyboardhandler(struct regs *r)
+{
+    unsigned char maybe = inb(0x60);
+    text_setpos(10, 0);
+    text_prints(string_itoa(maybe, 16));
+}
+void keyboardloop()
+{
+    text_setfgbg(14, 9);
+    text_setpos(10, 0);
+    text_printc(' ');
+    irq_install_handler(1, keyboardhandler);
+}
 void main(void)
 {
     outb(0x3D4, 0x0A); //disable text cursor
@@ -37,5 +50,8 @@ void main(void)
     text_init();
     splashscreen();
     interrupt_install();
+    asm("sti");
     text_prints("\nR-OS>");
+    keyboardloop();
+    //while (1); //it is important to say in C code
 }

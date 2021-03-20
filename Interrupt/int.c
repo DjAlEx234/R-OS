@@ -315,5 +315,4 @@ void interrupt_install()
     idt_install();
     irq_install();
     isr_install();
-    asm("sti");
 }
