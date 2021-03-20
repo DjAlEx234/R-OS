@@ -23,7 +23,7 @@ jmp $ ; quick loop :)
 kernel_load:
     cli
     mov bx, KERNEL_POS
-    mov dh, 21
+    mov dh, 20 ; important value, number of 512 sectors to be read OF kernel
     mov dl, [BOOT_DRIVE]
     call disk_load
     ret
