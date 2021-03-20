@@ -1,7 +1,7 @@
 [bits 16]
 [org 0x7c00]
 
-_start:
+_start: 
 
 KERNEL_POS equ 0x1000
 

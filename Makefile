@@ -26,7 +26,7 @@ kernel.o: Kernel/kernel.c
 
 cpuid.o: Kernel/cpuid.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC) -Wno-incompatible-pointer-types
-
+	#oh god anything but the incompatible pointer type
 string.o: Kernel/string.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
 
