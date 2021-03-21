@@ -33,14 +33,10 @@ void splashscreen()
     text_prints("Welcome to R-OS. CPU Info:\n");
     text_setfgbg(14, 9);
     text_prints("Bits:");
-    uint32_t input;
-    __asm__("mov $0x80000001, %eax\n\t");
-    __asm__("cpuid\n\t");
-    __asm__("mov %%edx, %0\n\t":"=r" (input));
-    int longmode = (int)(input >> 29);
-    if (longmode == 0)
+    int is64bit = cpuid_is64bit();
+    if (is64bit == 0)
         text_prints(" 32-bit");
-    else if (longmode == 1)
+    else if (is64bit == 1)
         text_prints(" 64-bit");
     else
         text_prints(" Architecture Unknown");
