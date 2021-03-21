@@ -6,7 +6,7 @@ all: run
 
 build: run clean
 
-kernel.bin: kernel-entry.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o
+kernel.bin: kernel-entry.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o
 	$(PREFIX)-ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
 
 kernel-entry.o: Kernel/kernel-entry.asm
@@ -28,6 +28,9 @@ cpuid.o: Kernel/cpuid.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC) -Wno-incompatible-pointer-types
 	#oh god anything but the incompatible pointer type
 string.o: Kernel/string.c
+	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
+
+keyboard.o: Devices/keybd.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
 
 intasm.o: Interrupt/int.asm

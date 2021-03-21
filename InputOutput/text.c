@@ -19,19 +19,22 @@ void text_setpos(int new_row, int new_column)
     row = new_row;
     column = new_column;
 }
+uint16_t text_getchar(unsigned char c, uint8_t color)
+{
+    return (uint16_t) c | (uint16_t) color << 8;
+}
+uint8_t text_getcolor(enum colors f, enum colors b)
+{
+    return f | b << 4;
+}
+enum colors fg, bg;
 void text_scroll()
 {
     for (int a = 0; a < height; a++)
         for (int b = 0; b < width; b++)
             video_memory[a * width + b] = video_memory[(a + 1) * width + b];
-}
-uint16_t text_getchar(unsigned char c, uint8_t color)
-{
-    return (uint16_t) c | (uint16_t) color << 8;
-}
-uint8_t text_getcolor(enum colors fg, enum colors bg)
-{
-    return fg | bg << 4;
+    for (int i = 0; i < 80; i++)
+        video_memory[25 * width + i] = text_getchar('\0', text_getcolor(0, bg));
 }
 void text_clear(enum colors color)
 {
@@ -41,7 +44,6 @@ void text_clear(enum colors color)
     row = 0;
     column = 0;
 }
-enum colors fg, bg;
 void text_setfgbg(int new_fg, int new_bg)
 {
     fg = new_fg;
