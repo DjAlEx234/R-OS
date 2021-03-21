@@ -1,14 +1,33 @@
 [bits 16]
 [org 0x7c00]
+_start:
 
-_start: 
+xor ax, ax
+mov ds, ax
+cld
 
 KERNEL_POS equ 0x1000
 
 mov [BOOT_DRIVE], dl
 
-mov bp, 0x9000
+mov bp, 0x7c00
 mov sp, bp
+
+mov si, msg
+call bios_print
+
+msg db 'cant find kernel!', 13, 10, 0
+
+bios_print:
+   lodsb
+   or al, al  ;zero=end of str
+   jz done    ;get out
+   mov ah, 0x0E
+   mov bh, 0
+   int 0x10
+   jmp bios_print
+
+done:
 
 call kernel_load
 call switch_protected_mode
@@ -37,4 +56,4 @@ BOOT_DRIVE db 0 ; boot drive storage
 
 times 510 - ($-$$) db 0 ; fill 512 byte mbr
 
-dw 0xaa55
+dw 0xAA55

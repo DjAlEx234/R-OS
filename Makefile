@@ -39,11 +39,11 @@ intasm.o: Interrupt/int.asm
 mbr.bin: MBR/mbr.asm
 	nasm $< -f bin -o $@
 
-os.bin: mbr.bin kernel.bin
+os.img: mbr.bin kernel.bin
 	cat $^ > $@
 
-run: os.bin
+run: os.img
 	qemu-system-i386 -drive format=raw,file=$<,index=0,if=floppy
 
 clean:
-	$(RM) *.bin *.o
+	$(RM) *.bin *.o *.img
