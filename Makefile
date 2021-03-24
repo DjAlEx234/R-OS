@@ -45,5 +45,22 @@ os.img: mbr.bin kernel.bin
 run: os.img
 	qemu-system-i386 -drive format=raw,file=$<,index=0,if=floppy
 
+boot.o: GRUB/grub.asm
+	nasm $< -felf32 -o $@
+
+grub-kernel.bin: boot.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o
+	$(PREFIX)-gcc -T GRUB/linker.ld -o $@ -I$(INC) -ffreestanding -O2 -nostdlib $^ -lgcc
+
+R-OS.iso: grub-kernel.bin
+	mkdir -p GRUB/iso/boot/grub
+	cp $< GRUB/iso/boot/kernel.bin
+	cp GRUB/grub.cfg GRUB/iso/boot/grub.cfg
+	grub-mkrescue -o R-OS.iso GRUB/iso
+	rm -r GRUB/iso
+	qemu-system-i386 -cdrom R-OS.iso
+
+grub: R-OS.iso clean
+
 clean:
 	$(RM) *.bin *.o *.img
+	del R-OS.iso
