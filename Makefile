@@ -54,7 +54,7 @@ grub-kernel.bin: boot.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o
 R-OS.iso: grub-kernel.bin
 	mkdir -p GRUB/iso/boot/grub
 	cp $< GRUB/iso/boot/kernel.bin
-	cp GRUB/grub.cfg GRUB/iso/boot/grub.cfg
+	cp GRUB/grub.cfg GRUB/iso/boot/grub/grub.cfg
 	grub-mkrescue -o R-OS.iso GRUB/iso
 	rm -r GRUB/iso
 	qemu-system-i386 -cdrom R-OS.iso
@@ -63,4 +63,4 @@ grub: R-OS.iso clean
 
 clean:
 	$(RM) *.bin *.o *.img
-	del R-OS.iso
+	rm R-OS.iso
