@@ -6,7 +6,7 @@ all: run
 
 build: run clean
 
-kernel.bin: kernel-entry.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o
+kernel.bin: kernel-entry.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o cmd.o
 	$(PREFIX)-ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
 
 kernel-entry.o: Kernel/kernel-entry.asm
@@ -33,6 +33,9 @@ string.o: Kernel/string.c
 keyboard.o: Devices/keybd.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
 
+cmd.o: UI/cmd.c
+	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
+
 intasm.o: Interrupt/int.asm
 	nasm $< -felf32 -o $@
 
@@ -48,7 +51,7 @@ run: os.img
 boot.o: GRUB/grub.asm
 	nasm $< -felf32 -o $@
 
-grub-kernel.bin: boot.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o
+grub-kernel.bin: boot.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o cmd.o
 	$(PREFIX)-gcc -T GRUB/linker.ld -o $@ -I$(INC) -ffreestanding -O2 -nostdlib $^ -lgcc
 
 R-OS.iso: grub-kernel.bin

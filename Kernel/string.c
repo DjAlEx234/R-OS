@@ -16,7 +16,7 @@ int string_cmp(char a[], char b[])
             return 0;
     return 1;
 }
-void string_reverse(char text[])
+void string_reverse(char* text)
 {
     int a, b;
     char c;
@@ -27,10 +27,9 @@ void string_reverse(char text[])
         text[b] = c;
     }
 }
-char* string_itoa(int conv, int base)
+void string_pitoa(int conv, char* yes, int base)
 {
     static char val[] = "0123456789ABCDEF";
-    char* yes = 0;
     int sign;
     if ((sign = conv) < 0) conv = -conv;
     do *yes++ = val[conv % base]; 
@@ -38,6 +37,9 @@ char* string_itoa(int conv, int base)
     if (sign < 0) 
         *yes++ = '-';
     *yes = '\0';
+}
+void string_itoa(int conv, char* yes, int base)
+{
+    string_pitoa(conv, yes, base);
     string_reverse(yes);
-    return yes;
 }

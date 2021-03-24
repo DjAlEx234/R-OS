@@ -4,6 +4,7 @@
 #include "keybd.h"
 #include "text.h"
 #include "int.h"
+#include "cmd.h"
 void splashscreen()
 {
     char* ln1 = " _____              ____     _____";
@@ -52,8 +53,9 @@ void main(void)
     splashscreen();
     interrupt_install();
     __asm__ volatile ("sti");
-    text_prints("\nR-OS>");
+    text_prints("\n\nR-OS>");
     text_setfgbg(7, 4);
     keyboard_init();
-    keyboard_listener(text_printc);
+    keyboard_listener(cmd_keyin);
+    while(1);
 }
