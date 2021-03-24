@@ -51,7 +51,7 @@ void main(void)
     text_init();
     splashscreen();
     interrupt_install();
-    asm("sti");
+    __asm__ volatile ("sti");
     text_prints("\nR-OS>");
     text_setfgbg(7, 4);
     keyboard_init();
