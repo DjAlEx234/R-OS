@@ -10,11 +10,11 @@ void cmd_keyin(char c)
         cmd_buffer[cmd_buff_pos] = c;
     else
     {
-        return;
+        volatile int c = cmd_buff_pos / 0;
     }
     text_setfgbg(3, 4);
     text_printc('\n');
-    char* yes = "jason";
+    char* yes = "";
     string_itoa(cmd_buff_pos, yes, 10);
     text_prints(yes);
     text_printc('\n');

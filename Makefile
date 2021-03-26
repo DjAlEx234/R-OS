@@ -41,6 +41,10 @@ boot.o: GRUB/grub.asm
 grub-kernel.bin: boot.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o cmd.o
 	$(PREFIX)-gcc -T GRUB/linker.ld -o $@ -I$(INC) -ffreestanding -O2 -nostdlib $^ -lgcc
 
+qemu-kernel: grub-kernel.bin
+	qemu-system-i386 -kernel $<
+	make clean
+
 R-OS.iso: grub-kernel.bin
 	mkdir -p GRUB/iso/boot/grub
 	cp $< GRUB/iso/boot/kernel.bin
@@ -49,8 +53,11 @@ R-OS.iso: grub-kernel.bin
 	rm -r GRUB/iso
 	qemu-system-i386 -cdrom R-OS.iso
 
-grub: R-OS.iso clean
+grub: R-OS.iso grub-clean
+
+grub-clean:
+	$(RM) *.bin *.o *.img
+	rm R-OS.iso
 
 clean:
 	$(RM) *.bin *.o *.img
-	rm R-OS.iso
