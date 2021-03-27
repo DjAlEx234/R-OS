@@ -34,7 +34,7 @@ void text_scroll()
         for (int b = 0; b < width; b++)
             video_memory[a * width + b] = video_memory[(a + 1) * width + b];
     for (int i = 0; i < 80; i++)
-        video_memory[25 * width + i] = text_getchar('\0', text_getcolor(0, bg));
+        video_memory[24 * width + i] = text_getchar('\0', text_getcolor(0, bg));
 }
 void text_clear(enum colors color)
 {

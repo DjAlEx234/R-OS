@@ -58,6 +58,17 @@ void keyboard_handler(__attribute__((unused)) struct regs *r)
     else
         keyboard_gotkey(keyboard_keys[key]);
 }
+void keyboard_waitchar(char c)
+{
+    void* keep = keyboard_send;
+    keyboard_send = 0;
+    unsigned char wait = 0;
+    while (keyboard_keys[wait] != c)
+    {
+        wait = inb(0x60);
+    }
+    keyboard_send = keep;
+}
 void keyboard_init()
 {
     irq_install_handler(1, keyboard_handler);

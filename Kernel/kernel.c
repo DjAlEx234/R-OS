@@ -46,6 +46,13 @@ void splashscreen()
     text_prints(cpuid_string());
     text_setfgbg(15, 4);
 }
+void cmd()
+{
+    text_prints("\nR-OS>");
+    text_setfgbg(7, 4);
+    cmd_mode("Text Mode");
+    keyboard_listener(term_keyin);
+}
 void main(void)
 {
     outb(0x3D4, 0x0A); //disable text cursor
@@ -54,10 +61,9 @@ void main(void)
     splashscreen();
     interrupt_install();
     __asm__ volatile ("sti");
-    text_prints("\n\nR-OS>");
-    text_setfgbg(7, 4);
     keyboard_init();
-    cmd_mode("Command Line");
-    keyboard_listener(term_keyin);
+    text_prints("\n\nPress SPACE to enter command line...");
+    keyboard_waitchar(' ');
+    cmd();
     while(1);
 }

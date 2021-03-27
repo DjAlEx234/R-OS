@@ -7,7 +7,7 @@ char* commands[command_num] = {
 };
 void about()
 {
-    text_prints("\nR-OS Pre-Alpha\nRunning in: ");
+    text_prints("\nR-OS Pre-Alpha CLI\nRunning in: ");
     text_prints(terminal_mode);
     text_printc('\n');
 }
