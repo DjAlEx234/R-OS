@@ -10,7 +10,7 @@ void cmd_keyin(char c)
         cmd_buffer[cmd_buff_pos] = c;
     else
     {
-        volatile int c = cmd_buff_pos / 0;
+        return;
     }
     text_setfgbg(3, 4);
     text_printc('\n');

@@ -52,12 +52,10 @@ R-OS.iso: grub-kernel.bin
 	grub-mkrescue -o R-OS.iso GRUB/iso
 	rm -r GRUB/iso
 	qemu-system-i386 -cdrom R-OS.iso
-
-grub: R-OS.iso grub-clean
-
-grub-clean:
-	$(RM) *.bin *.o *.img
+	make clean
 	rm R-OS.iso
+
+grub: R-OS.iso
 
 clean:
 	$(RM) *.bin *.o *.img
