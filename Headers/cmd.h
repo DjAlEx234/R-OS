@@ -1,4 +1,5 @@
 #ifndef cmdh
 #define cmdh
-void cmd_keyin(char c);
+void cmd_run(char* cmd);
+void cmd_mode(char* mode);
 #endif

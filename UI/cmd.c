@@ -1,23 +1,51 @@
-#include "string.h"
-#include "keybd.h"
 #include "text.h"
-#include "int.h"
-char cmd_buffer[100];
-int cmd_buff_pos = 0;
-void cmd_keyin(char c)
+#include "string.h"
+#define command_num 3
+char* terminal_mode = "";
+char* commands[command_num] = {
+    "about", "cls", "help"
+};
+void about()
 {
-    if (cmd_buff_pos++ < 100)
-        cmd_buffer[cmd_buff_pos] = c;
-    else
+    text_prints("\nR-OS Pre-Alpha\nRunning in: ");
+    text_prints(terminal_mode);
+    text_printc('\n');
+}
+void cls()
+{
+    text_prints("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    text_setpos(0, 0);
+}
+void help()
+{
+    text_prints("\nList of available commands:");
+    for (int i = 0; i < command_num; i++)
     {
-        return;
+        text_printc('\n');
+        text_prints(commands[i]);
     }
-    text_setfgbg(3, 4);
     text_printc('\n');
-    char* yes = "";
-    string_itoa(cmd_buff_pos, yes, 10);
-    text_prints(yes);
-    text_printc('\n');
-    text_setfgbg(1, 2);
-    text_printc(c);
+}
+void* commandptr[command_num] = {
+    about, cls, help
+};
+void cmd_run(char* command)
+{
+    for (int i = 0; i < command_num; i++)
+    {
+        if (string_cmp(command, commands[i]))
+        {
+            void(*v)() = commandptr[i];
+            text_setfgbg(10, 4);
+            v();
+            return;
+        }
+    }
+    text_prints("\nCommand \'");
+    text_prints(command);
+    text_prints("\' not found.\nUse \'help\' for a list of commands.\n");
+}
+void cmd_mode(char* name)
+{
+    terminal_mode = name;
 }

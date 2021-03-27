@@ -1,3 +1,4 @@
+#include "terminal.h"
 #include "inoutb.h"
 #include "string.h"
 #include "cpuid.h"
@@ -56,6 +57,7 @@ void main(void)
     text_prints("\n\nR-OS>");
     text_setfgbg(7, 4);
     keyboard_init();
-    keyboard_listener(cmd_keyin);
+    cmd_mode("Command Line");
+    keyboard_listener(term_keyin);
     while(1);
 }
