@@ -35,13 +35,10 @@ void splashscreen()
     text_prints("Welcome to R-OS. CPU Info:\n");
     text_setfgbg(14, 9);
     text_prints("Bits:");
-    int is64bit = cpuid_is64bit();
-    if (is64bit == 0)
+    if (!cpuid_is64bit())
         text_prints(" 32-bit");
-    else if (is64bit == 1)
-        text_prints(" 64-bit");
     else
-        text_prints(" Architecture Unknown");
+        text_prints(" 64-bit");
     text_prints(" Vendor: ");
     text_prints(cpuid_string());
     text_setfgbg(15, 4);

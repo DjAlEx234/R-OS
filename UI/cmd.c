@@ -1,9 +1,9 @@
 #include "text.h"
 #include "string.h"
-#define command_num 3
+#define command_num 4
 char* terminal_mode = "";
 char* commands[command_num] = {
-    "about", "cls", "help"
+    "about", "cls", "help", "reboot"
 };
 void about()
 {
@@ -26,8 +26,21 @@ void help()
     }
     text_printc('\n');
 }
+#include "inoutb.h"
+void reboot()
+{
+    __asm__ volatile ("cli");
+    uint8_t temp = 0x02;
+    while (temp & 0x02)
+       temp = inb(0x64);
+    outb(0x64, 0xFE);
+    text_prints("\nReboot feature not supported, halting!");
+halt:
+    __asm__ volatile ("hlt");
+    goto halt;
+}
 void* commandptr[command_num] = {
-    about, cls, help
+    about, cls, help, reboot
 };
 void cmd_run(char* command)
 {

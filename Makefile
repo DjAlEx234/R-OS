@@ -61,4 +61,4 @@ R-OS.iso: grub-kernel.bin
 grub: R-OS.iso
 
 clean:
-	$(RM) *.bin *.o *.img
+	$(RM) *.bin *.o
