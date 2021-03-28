@@ -36,38 +36,60 @@ char keyboard_keys[128] = {
     0,  /* F12 Key */
     0,  /* All other keys are undefined */
 };
+#include <stdbool.h>
 #include "inoutb.h"
+#include "keybd.h"
 #include "int.h"
-void*keyboard_send = 0;
+void*keyboard_ptr = 0;
 void keyboard_listener(void* v)
 {
-    keyboard_send = v;
+    keyboard_ptr = v;
 }
-void keyboard_gotkey(char c)
+bool shift;
+bool ctrl;
+bool alt;
+void keyboard_gotkey(struct keyboard_send key)
 {
-    if (keyboard_send == 0)
+    if (keyboard_ptr == 0)
         return;
-    void (*send)(char key) = keyboard_send;
-    send(c);
+    void (*send)(struct keyboard_send key) = keyboard_ptr;
+    send(key);
 }
 void keyboard_handler(__attribute__((unused)) struct regs *r)
 {
     unsigned char key = inb(0x60);
+    if (key == 0x2A || key == 0x36)
+        shift = true;
+    if (key == 0x1D)
+        ctrl = true;
+    if (key == 0x38)
+        alt = true;
+    if (key == 0xAA || key == 0xB6)
+        shift = false;
+    if (key == 0x9D)
+        ctrl = false;
+    if (key == 0xB8)
+        alt = false;
     if (key & 0x80)
         return;
-    else
-        keyboard_gotkey(keyboard_keys[key]);
+    struct keyboard_send tosend;
+    tosend.shift = shift;
+    tosend.ctrl = ctrl;
+    tosend.alt = alt;
+    tosend.scan = key;
+    tosend.ascii = keyboard_keys[key];
+    keyboard_gotkey(tosend);
 }
 void keyboard_waitchar(char c)
 {
-    void* keep = keyboard_send;
-    keyboard_send = 0;
+    void* keep = keyboard_ptr;
+    keyboard_ptr = 0;
     unsigned char wait = 0;
     while (keyboard_keys[wait] != c)
     {
         wait = inb(0x60);
     }
-    keyboard_send = keep;
+    keyboard_ptr = keep;
 }
 void keyboard_init()
 {

@@ -33,8 +33,9 @@ void term_run()
     text_prints("R-OS>");
     text_setfgbg(7, 4);
 }
-void term_keyin(char c)
+void term_keyin(struct keyboard_send send)
 {
+    char c = send.ascii;
     if (c >= 32 && c <= 126)
         term_bufin(c);
     else if (c == 8)

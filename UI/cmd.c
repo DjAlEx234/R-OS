@@ -21,7 +21,7 @@ void cls()
 }
 void echo()
 {
-    if (cmd_splote[1] == 0)
+    if (string_cmp("echo\0", cmd_notsplit) || string_cmp("echo \0", cmd_notsplit))
     {
         text_prints("\nNothing to echo!\n");
         return;
