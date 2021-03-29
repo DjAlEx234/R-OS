@@ -37,14 +37,15 @@ char number_shift[10] = {
     ')', '!', '@', '#', '$', 
     '%', '^', '&', '*', '('
 };
-char other_shift[11] = {
-    '~', '_', '+', '{', '}',
-    '|', ':', '"', '<', '>',
-    '?'
-};
 void term_keyin(struct keyboard_send send)
 {
     char c = send.ascii;
+    if (c >= 32 && c <= 126 && !send.shift)
+        term_bufin(c);
+    else if (c == 8)
+        term_bufdel();
+    else if (c == 10)
+        term_run();
     if ((c >= 32 && c <= 126) && send.shift)
     {
         if (c >= 97 && c <= 122)
@@ -96,10 +97,4 @@ void term_keyin(struct keyboard_send send)
                 break;
         }
     }
-    if (c >= 32 && c <= 126)
-        term_bufin(c);
-    else if (c == 8)
-        term_bufdel();
-    else if (c == 10)
-        term_run();
 }

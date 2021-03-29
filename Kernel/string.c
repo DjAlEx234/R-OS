@@ -16,7 +16,6 @@ int string_cmp(char a[], char b[])
             return 0;
     return 1;
 }
-extern void text_printc();
 void string_tolower(char* s)
 {
     for (int i = 0; i < string_len(s); i++)
