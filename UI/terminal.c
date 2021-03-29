@@ -33,6 +33,15 @@ void term_run()
     text_prints("R-OS>");
     text_setfgbg(7, 4);
 }
+char number_shift[10] = {
+    ')', '!', '@', '#', '$', 
+    '%', '^', '&', '*', '('
+};
+char other_shift[11] = {
+    '~', '_', '+', '{', '}',
+    '|', ':', '"', '<', '>',
+    '?'
+};
 void term_keyin(struct keyboard_send send)
 {
     char c = send.ascii;
@@ -42,6 +51,49 @@ void term_keyin(struct keyboard_send send)
         {
             term_bufin(c - 32);
             return;
+        }
+        else if (c >= 48 && c <= 57)
+        {
+            term_bufin(number_shift[c - 48]);
+            return;
+        }
+        switch (c)
+        {
+            case '`':
+                term_bufin('~');
+                return;
+            case '-':
+                term_bufin('_');
+                return;
+            case '=':
+                term_bufin('+');
+                return;
+            case '[':
+                term_bufin('{');
+                return;
+            case ']':
+                term_bufin('}');
+                return;
+            case '\\':
+                term_bufin('|');
+                return;
+            case ';':
+                term_bufin(':');
+                return;
+            case '\'':
+                term_bufin('"');
+                return;
+            case ',':
+                term_bufin('<');
+                return;
+            case '.':
+                term_bufin('>');
+                return;
+            case '/':
+                term_bufin('?');
+                return;
+            default:
+                break;
         }
     }
     if (c >= 32 && c <= 126)
