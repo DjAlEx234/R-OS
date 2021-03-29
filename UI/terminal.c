@@ -46,7 +46,7 @@ void term_keyin(struct keyboard_send send)
         term_bufdel();
     else if (c == 10)
         term_run();
-    if ((c >= 32 && c <= 126) && send.shift)
+    else if ((c >= 32 && c <= 126) && send.shift)
     {
         if (c >= 97 && c <= 122)
         {

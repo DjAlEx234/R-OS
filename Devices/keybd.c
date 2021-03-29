@@ -55,25 +55,46 @@ void keyboard_gotkey(struct keyboard_send key)
     void (*send)(struct keyboard_send key) = keyboard_ptr;
     send(key);
 }
+bool caps = false;
 void keyboard_handler(__attribute__((unused)) struct regs *r)
 {
     unsigned char key = inb(0x60);
-    if (key == 0x2A || key == 0x36)
-        shift = true;
-    if (key == 0x1D)
-        ctrl = true;
-    if (key == 0x38)
-        alt = true;
-    if (key == 0xAA || key == 0xB6)
-        shift = false;
-    if (key == 0x9D)
-        ctrl = false;
-    if (key == 0xB8)
-        alt = false;
+    switch (key)
+    {
+        case 0xAA:
+            shift = false;
+            break;
+        case 0xB6:
+            shift = false;
+            break;
+        case 0x9D:
+            ctrl = false;
+            break;
+        case 0xB8:
+            alt = false;
+            break;
+        case 0x2A:
+            shift = true;
+            break;
+        case 0x36:
+            shift = true;
+            break;
+        case 0x1D:
+            ctrl = true;
+            break;
+        case 0x38:
+            alt = true;
+            break;
+        case 0x3A:
+            caps = !caps;
+            return;
+        default:
+            break;
+    }
     if (key & 0x80)
         return;
     struct keyboard_send tosend;
-    tosend.shift = shift;
+    tosend.shift = shift ^ caps;
     tosend.ctrl = ctrl;
     tosend.alt = alt;
     tosend.scan = key;
