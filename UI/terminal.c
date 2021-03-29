@@ -18,8 +18,8 @@ void term_bufdel()
     if (term_buff_pos == 0)
         return;
     text_printc('\b');
-    term_buffer[term_buff_pos] = 0;
     term_buff_pos--;
+    term_buffer[term_buff_pos] = 0;
 }
 void term_run()
 {
@@ -36,6 +36,14 @@ void term_run()
 void term_keyin(struct keyboard_send send)
 {
     char c = send.ascii;
+    if ((c >= 32 && c <= 126) && send.shift)
+    {
+        if (c >= 97 && c <= 122)
+        {
+            term_bufin(c - 32);
+            return;
+        }
+    }
     if (c >= 32 && c <= 126)
         term_bufin(c);
     else if (c == 8)

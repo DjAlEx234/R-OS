@@ -89,7 +89,8 @@ void cmd_split(char tosplit[])
 void cmd_run(char* command)
 {
     cmd_notsplit = command;
-    cmd_split(command);
+    cmd_split(cmd_notsplit);
+    string_tolower(cmd_splote[0]);
     for (int i = 0; i < command_num; i++)
     {
         if (string_cmp(cmd_splote[0], commands[i]))

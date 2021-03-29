@@ -1,3 +1,7 @@
+#include <stdbool.h>
+#include "inoutb.h"
+#include "keybd.h"
+#include "int.h"
 char keyboard_keys[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8',
     '9', '0', '-', '=', '\b',
@@ -36,10 +40,6 @@ char keyboard_keys[128] = {
     0,  /* F12 Key */
     0,  /* All other keys are undefined */
 };
-#include <stdbool.h>
-#include "inoutb.h"
-#include "keybd.h"
-#include "int.h"
 void*keyboard_ptr = 0;
 void keyboard_listener(void* v)
 {
