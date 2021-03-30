@@ -42,6 +42,8 @@ void term_keyin(struct keyboard_send send)
     char c = send.ascii;
     if (c >= 32 && c <= 126 && !send.shift)
         term_bufin(c);
+    else if (c == 32)
+        term_bufin(c);
     else if (c == 8)
         term_bufdel();
     else if (c == 10)
