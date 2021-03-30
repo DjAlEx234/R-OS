@@ -48,6 +48,7 @@ void cmd()
     text_prints("\nR-OS>");
     text_setfgbg(7, 4);
     cmd_mode("Text Mode");
+    term_ptr(text_printc, text_prints, text_setfgbg, text_setpos);
     keyboard_listener(term_keyin);
 }
 void main(void)

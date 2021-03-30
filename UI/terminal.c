@@ -1,23 +1,33 @@
 #include "string.h"
 #include "keybd.h"
-#include "text.h"
-#include "int.h"
 #include "cmd.h"
 static char term_buffer[101];
 int term_buff_pos = 0;
+void(*printc)(char c);
+void(*prints)(char* s);
+void(*setpos)(int r, int c);
+void(*fgbg)(int fg, int bg);
+void term_ptr(void* pc, void* ps, void* fb, void* pos)
+{
+    printc = pc;
+    prints = ps;
+    fgbg = fb;
+    setpos = pos;
+    cmd_ptr(printc, prints, fgbg, setpos);
+}
 void term_bufin(char c)
 {
     if (term_buff_pos < 100)
         term_buffer[term_buff_pos++] = c;
     else
         return;
-    text_printc(c);
+    printc(c);
 }
 void term_bufdel()
 {
     if (term_buff_pos == 0)
         return;
-    text_printc('\b');
+    printc('\b');
     term_buff_pos--;
     term_buffer[term_buff_pos] = 0;
 }
@@ -29,9 +39,9 @@ void term_run()
     for (int i = 0; i < term_buff_pos; i++)
         term_buffer[i] = 0;
     term_buff_pos = 0;
-    text_setfgbg(15, 4);
-    text_prints("R-OS>");
-    text_setfgbg(7, 4);
+    fgbg(15, 4);
+    prints("R-OS>");
+    fgbg(7, 4);
 }
 char number_shift[10] = {
     ')', '!', '@', '#', '$', 

@@ -1,6 +1,5 @@
 #include "string.h"
 #include "inoutb.h"
-#include "text.h"
 #define command_num 5
 char* terminal_mode = "";
 char* commands[command_num] = {
@@ -8,37 +7,41 @@ char* commands[command_num] = {
 };
 char* cmd_notsplit = 0;
 char cmd_splote[10][20];
+void(*printc)(char c);
+void(*prints)(char* s);
+void(*setpos)(int r, int c);
+void(*fgbg)(int fg, int bg);
 void about()
 {
-    text_prints("\nR-OS Pre-Alpha CLI\nRunning in: ");
-    text_prints(terminal_mode);
-    text_printc('\n');
+    prints("\nR-OS Pre-Alpha CLI\nRunning in: ");
+    prints(terminal_mode);
+    printc('\n');
 }
 void cls()
 {
-    text_prints("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-    text_setpos(0, 0);
+    prints("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    setpos(0, 0);
 }
 void echo()
 {
     if (string_cmp("echo\0", cmd_notsplit) || string_cmp("echo \0", cmd_notsplit))
     {
-        text_prints("\nNothing to echo!\n");
+        prints("\nNothing to echo!\n");
         return;
     }
-    text_printc('\n');
-    text_prints(cmd_notsplit + 5);
-    text_printc('\n');
+    printc('\n');
+    prints(cmd_notsplit + 5);
+    printc('\n');
 }
 void help()
 {
-    text_prints("\nList of available commands:");
+    prints("\nList of available commands:");
     for (int i = 0; i < command_num; i++)
     {
-        text_printc('\n');
-        text_prints(commands[i]);
+        printc('\n');
+        prints(commands[i]);
     }
-    text_printc('\n');
+    printc('\n');
 }
 void reboot()
 {
@@ -47,7 +50,7 @@ void reboot()
     while (temp & 0x02)
        temp = inb(0x64);
     outb(0x64, 0xFE);
-    text_prints("\nReboot feature not supported, halting!");
+    prints("\nReboot feature not supported, halting!");
 halt:
     __asm__ volatile ("hlt");
     goto halt;
@@ -96,17 +99,24 @@ void cmd_run(char* command)
         if (string_cmp(cmd_splote[0], commands[i]))
         {
             void(*v)() = commandptr[i];
-            text_setfgbg(10, 4);
+            fgbg(10, 4);
             v();
             return;
         }
     }
-    text_prints("\nCommand \'");
-    text_prints(command);
-    text_prints("\' not found.\nUse \'help\' for a list of commands.\n");
+    prints("\nCommand \'");
+    prints(command);
+    prints("\' not found.\nUse \'help\' for a list of commands.\n");
     cmd_clear();
 }
 void cmd_mode(char* name)
 {
     terminal_mode = name;
+}
+void cmd_ptr(void* pc, void* ps, void* fb, void* pos)
+{
+    printc = pc;
+    prints = ps;
+    fgbg = fb;
+    setpos = pos;
 }
