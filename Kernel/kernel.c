@@ -15,7 +15,7 @@ void splashscreen()
     char* ln5 = "| | \\ \\           | |__| |  ____) |";
     char* ln6 = "|_|  \\_\\           \\____/  |_____/";
     text_clear(4);
-    text_setfgbg(4, 1);
+    text_setfgbg(12, 1);
     text_prints("\n\n\n\n\n\n");
     text_setpos(0, 0);
     text_prints(ln1);
