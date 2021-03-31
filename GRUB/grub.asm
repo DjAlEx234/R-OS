@@ -18,7 +18,9 @@ global _start:function (_start.end - _start)
 _start:
         cli
         mov esp, stack_top
-        extern main
-        call main   
+        extern multiboot_main
+        push ebx; give me the multiboot ram ;)
+        push eax; magic!!
+        call multiboot_main   
 .loop:	jmp $
 .end:

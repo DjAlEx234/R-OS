@@ -53,15 +53,78 @@ void cmd()
 }
 void main(void)
 {
+    splashscreen();
+    cmd();
+    while(1);
+}
+#include "multiboot.h"
+void multiboot_main(unsigned long magic, unsigned long addr)
+{
     outb(0x3D4, 0x0A); //disable text cursor
 	outb(0x3D5, 0x20);
     text_init();
-    splashscreen();
+    text_setfgbg(15, 0);
+    text_prints("DEBUG INFO:\n");
+    char* mag = 0;
+    string_itoa(magic, mag, 16);
+    text_prints("MAGIC: ");
+    text_prints(mag);
+    multiboot_info_t *mbi;
+    mbi = (multiboot_info_t*) addr;
+    string_itoa((unsigned) mbi->flags, mag, 2);
+    text_prints("\nFLAGS: ");
+    text_prints(mag);
+    if (mbi->flags & (1 << 0))
+    {
+        string_itoa((unsigned) mbi->mem_lower, mag, 16);
+        text_prints("\nMEMLO: ");
+        text_prints(mag);
+        string_itoa((unsigned) mbi->mem_upper, mag, 16);
+        text_prints("\nMEMHI: ");
+        text_prints(mag);
+    }
+    if (mbi->flags & (1 << 6))
+    {
+        multiboot_memory_map_t *mem;
+        string_itoa((unsigned) mbi->mmap_addr, mag, 16);
+        text_prints("\nMMAPA: ");
+        text_prints(mag);
+        string_itoa((unsigned) mbi->mmap_length, mag, 16);
+        text_prints("\nMMAPL: ");
+        text_prints(mag);
+        for (mem = (multiboot_memory_map_t *) mbi->mmap_addr; (unsigned long) mem < mbi->mmap_addr + mbi->mmap_length; mem = (multiboot_memory_map_t *) ((unsigned long) mem + mem->size + sizeof (mem->size)))
+        {
+            string_itoa((unsigned) mem->size, mag, 16);
+            text_prints("\nMSIZE: ");
+            text_prints(mag);
+            string_itoa((unsigned) (mem->addr >> 32), mag, 16);
+            text_prints(" MADDR: ");
+            text_prints(mag);
+            string_itoa((unsigned) (mem->addr & 0xffffffff), mag, 16);
+            text_prints(mag);
+            string_itoa((unsigned) (mem->len >> 32), mag, 16);
+            text_prints(" MLENG: ");
+            text_prints(mag);
+            string_itoa((unsigned) (mem->len & 0xffffffff), mag, 16);
+            text_prints(mag);
+            if ((unsigned) mem->type == 1)
+                text_prints(" MTYPE: AVAILABLE");
+            else if ((unsigned) mem->type == 2)
+                text_prints(" MTYPE: RESERVED");
+            else if ((unsigned) mem->type == 3)
+                text_prints(" MTYPE: ACPI RECLAIMABLE");
+            else if ((unsigned) mem->type == 4)
+                text_prints(" MTYPE: NVS");
+            else if ((unsigned) mem->type == 5)
+                text_prints(" MTYPE: BAD RAM");
+        }
+    }
     interrupt_install();
     __asm__ volatile ("sti");
     keyboard_init();
-    text_prints("\n\nPress SPACE to enter command line...");
+    text_printc('\n');
+    text_setfgbg(0, 15);
+    text_prints("Press SPACE to enter R-OS...");
     keyboard_waitchar(' ');
-    cmd();
-    while(1);
+    main();
 }
