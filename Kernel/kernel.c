@@ -97,26 +97,29 @@ void multiboot_main(unsigned long magic, unsigned long addr)
             string_itoa((unsigned) mem->size, mag, 16);
             text_prints("\nMSIZE: ");
             text_prints(mag);
+            text_setpos(text_get_row(), 10);
             string_itoa((unsigned) (mem->addr >> 32), mag, 16);
-            text_prints(" MADDR: ");
+            text_prints("MADDR: ");
             text_prints(mag);
             string_itoa((unsigned) (mem->addr & 0xffffffff), mag, 16);
             text_prints(mag);
+            text_setpos(text_get_row(), 26);
             string_itoa((unsigned) (mem->len >> 32), mag, 16);
-            text_prints(" MLENG: ");
+            text_prints("MLENG: ");
             text_prints(mag);
             string_itoa((unsigned) (mem->len & 0xffffffff), mag, 16);
             text_prints(mag);
+            text_setpos(text_get_row(), 42);
             if ((unsigned) mem->type == 1)
-                text_prints(" MTYPE: AVAILABLE");
+                text_prints("MTYPE: AVAILABLE");
             else if ((unsigned) mem->type == 2)
-                text_prints(" MTYPE: RESERVED");
+                text_prints("MTYPE: RESERVED");
             else if ((unsigned) mem->type == 3)
-                text_prints(" MTYPE: ACPI RECLAIMABLE");
+                text_prints("MTYPE: ACPI RECLAIMABLE");
             else if ((unsigned) mem->type == 4)
-                text_prints(" MTYPE: NVS");
+                text_prints("MTYPE: NVS");
             else if ((unsigned) mem->type == 5)
-                text_prints(" MTYPE: BAD RAM");
+                text_prints("MTYPE: BAD RAM");
         }
     }
     interrupt_install();
