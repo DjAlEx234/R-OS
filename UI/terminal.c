@@ -3,17 +3,17 @@
 #include "cmd.h"
 static char term_buffer[101];
 int term_buff_pos = 0;
-void(*printc)(char c);
-void(*prints)(char* s);
-void(*setpos)(int r, int c);
-void(*fgbg)(int fg, int bg);
+void(*printcptr)(char c);
+void(*printsptr)(char* s);
+void(*setposptr)(int r, int c);
+void(*fgbgptr)(int fg, int bg);
 void term_ptr(void* pc, void* ps, void* fb, void* pos)
 {
-    printc = pc;
-    prints = ps;
-    fgbg = fb;
-    setpos = pos;
-    cmd_ptr(printc, prints, fgbg, setpos);
+    printcptr = pc;
+    printsptr = ps;
+    fgbgptr = fb;
+    setposptr = pos;
+    cmd_ptr(printcptr, printsptr, fgbgptr, setposptr);
 }
 void term_bufin(char c)
 {
@@ -21,13 +21,13 @@ void term_bufin(char c)
         term_buffer[term_buff_pos++] = c;
     else
         return;
-    printc(c);
+    printcptr(c);
 }
 void term_bufdel()
 {
     if (term_buff_pos == 0)
         return;
-    printc('\b');
+    printcptr('\b');
     term_buff_pos--;
     term_buffer[term_buff_pos] = 0;
 }
@@ -39,9 +39,9 @@ void term_run()
     for (int i = 0; i < term_buff_pos; i++)
         term_buffer[i] = 0;
     term_buff_pos = 0;
-    fgbg(15, 4);
-    prints("R-OS>");
-    fgbg(7, 4);
+    fgbgptr(15, 4);
+    printsptr("R-OS>");
+    fgbgptr(7, 4);
 }
 char number_shift[10] = {
     ')', '!', '@', '#', '$', 
