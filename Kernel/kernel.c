@@ -104,13 +104,13 @@ void multiboot_main(unsigned long magic, unsigned long addr)
             text_prints(mag);
             string_itoa((unsigned) (mem->addr & 0xffffffff), mag, 16);
             text_prints(mag);
-            text_setpos(text_get_row(), 27);
+            text_setpos(text_get_row(), 30);
             string_itoa((unsigned) (mem->len >> 32), mag, 16);
             text_prints("MLENG: ");
             text_prints(mag);
             string_itoa((unsigned) (mem->len & 0xffffffff), mag, 16);
             text_prints(mag);
-            text_setpos(text_get_row(), 44);
+            text_setpos(text_get_row(), 50);
             if ((unsigned) mem->type == 1)
                 text_prints("MTYPE: AVAILABLE");
             else if ((unsigned) mem->type == 2)
