@@ -48,7 +48,7 @@ grub-kernel.bin: boot.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o
 	$(PREFIX)-gcc -T GRUB/linker.ld -o $@ -I$(INC) -ffreestanding -O2 -nostdlib $^ -lgcc
 
 qemu-kernel: grub-kernel.bin
-	qemu-system-i386 -kernel $<
+	qemu-system-i386 -kernel $< -m 2G
 	make clean
 
 R-OS.iso: grub-kernel.bin
@@ -57,7 +57,7 @@ R-OS.iso: grub-kernel.bin
 	cp GRUB/grub.cfg GRUB/iso/boot/grub/grub.cfg
 	grub-mkrescue -o R-OS.iso GRUB/iso
 	rm -r GRUB/iso
-	qemu-system-i386 -cdrom R-OS.iso
+	qemu-system-i386 -cdrom R-OS.iso -m 2G
 	make clean
 	rm R-OS.iso
 
