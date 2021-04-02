@@ -11,6 +11,5 @@ struct regs
 void interrupt_install();
 void irq_install_handler(int irq, void (*handler)(struct regs *r));
 void irq_uninstall_handler(int irq);
-void irq_remove_handler(int irq);
 void error_handler(char* errortext);
 #endif

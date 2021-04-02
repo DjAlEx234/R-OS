@@ -24,6 +24,9 @@ cpuid.o: Kernel/cpuid.c
 string.o: Kernel/string.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
 
+mouse.o: Devices/mouse.c
+	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
+
 keyboard.o: Devices/keybd.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
 
@@ -41,7 +44,7 @@ run: grub
 boot.o: GRUB/grub.asm
 	nasm $< -felf32 -o $@
 
-grub-kernel.bin: boot.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o terminal.o cmd.o
+grub-kernel.bin: boot.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o terminal.o cmd.o mouse.o
 	$(PREFIX)-gcc -T GRUB/linker.ld -o $@ -I$(INC) -ffreestanding -O2 -nostdlib $^ -lgcc
 
 qemu-kernel: grub-kernel.bin

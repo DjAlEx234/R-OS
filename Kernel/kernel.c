@@ -3,6 +3,7 @@
 #include "string.h"
 #include "cpuid.h"
 #include "keybd.h"
+#include "mouse.h"
 #include "text.h"
 #include "int.h"
 #include "cmd.h"
@@ -123,8 +124,9 @@ void multiboot_main(unsigned long magic, unsigned long addr)
         }
     }
     interrupt_install();
-    __asm__ volatile ("sti");
     keyboard_init();
+    mouse_install();
+    __asm__ volatile ("sti");
     text_printc('\n');
     text_setfgbg(0, 15);
     text_prints("Press SPACE to enter R-OS...");

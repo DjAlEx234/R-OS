@@ -1,9 +1,9 @@
 #include "string.h"
 #include "inoutb.h"
-#define command_num 5
+#define command_num 6
 char* terminal_mode = "";
 char* commands[command_num] = {
-    "about", "cls", "echo", "help", "reboot"
+    "about", "cls", "echo", "help", "mouse", "reboot"
 };
 char* cmd_notsplit = 0;
 char cmd_splote[10][20];
@@ -43,6 +43,41 @@ void help()
     }
     printc('\n');
 }
+#include "mouse.h"
+void mouse_local(uint8_t b1, uint8_t b2, uint8_t b3)
+{
+    int c = text_get_column();
+    int r = text_get_row();
+    setpos(0, 72);
+    prints("        ");
+    char* itoa = 0;
+    string_itoa(b1, itoa, 2);
+    setpos(0, 72);
+    prints(itoa);
+    string_itoa(b2, itoa, 2);
+    setpos(1, 72);
+    prints(itoa);
+    string_itoa(b3, itoa, 2);
+    setpos(2, 72);
+    prints(itoa);
+    setpos(r, c);
+}
+int mouse_running = 0;
+void mouse()
+{
+    cls();
+    if (mouse_running == 0)
+    {
+        mouse_setout(*mouse_local);
+        mouse_running = 1;
+    }
+    else
+    {
+        mouse_setout(0);
+        mouse_running = 0;
+    }
+    printc('\n');
+}
 void reboot()
 {
     __asm__ volatile ("cli");
@@ -56,7 +91,7 @@ halt:
     goto halt;
 }
 void* commandptr[command_num] = {
-    about, cls, echo, help, reboot
+    about, cls, echo, help, mouse, reboot
 };
 void cmd_clear()
 {
