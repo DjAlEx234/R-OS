@@ -44,21 +44,64 @@ void help()
     printc('\n');
 }
 #include "mouse.h"
+int x, y;
+char* blank = "        ";
 void mouse_local(uint8_t b1, uint8_t b2, uint8_t b3)
 {
     int c = text_get_column();
     int r = text_get_row();
+    setpos(5, 72);
+    if (b1 & 0x80 || b1 & 0x40)
+    {
+        prints("OVERFLOW");
+        setpos(r, c);
+        return;
+    }
+    else
+        prints(blank);
     setpos(0, 72);
-    prints("        ");
+    prints(blank);
+    setpos(1, 72);
+    prints(blank);
+    setpos(2, 72);
+    prints(blank);
     char* itoa = 0;
     string_itoa(b1, itoa, 2);
-    setpos(0, 72);
+    setpos(0, 69);
+    prints("p1:");
     prints(itoa);
     string_itoa(b2, itoa, 2);
-    setpos(1, 72);
+    setpos(1, 69);
+    prints("p2:");
     prints(itoa);
     string_itoa(b3, itoa, 2);
-    setpos(2, 72);
+    setpos(2, 69);
+    prints("p3:");
+    prints(itoa);
+    unsigned int mouse_x = 0, mouse_y = 0;
+    mouse_x = b2 - ((b1 << 4) & 0x100);
+    mouse_y = b3 - ((b1 << 3) & 0x100);
+    setpos(3, 72);
+    prints(blank);
+    setpos(4, 72);
+    prints(blank);
+    x = x + mouse_x;
+    y = y + mouse_y;
+    if (x < 0)
+        x = 0;
+    else if (x > 640)
+        x = 640;
+    if (y < 0)
+        y = 0;
+    else if (y > 400)
+        y = 400;
+    string_itoa(x, itoa, 10);
+    setpos(3, 69);
+    prints("mX:");
+    prints(itoa);
+    string_itoa(y, itoa, 10);
+    setpos(4, 69);
+    prints("mY:");
     prints(itoa);
     setpos(r, c);
 }
