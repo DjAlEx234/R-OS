@@ -7,5 +7,7 @@ The roadmap for the future:
 - [ ] Get/set graphical setup from multiboot
 - [ ] User interface
 
+Code source:
 Currently, I am using the help of GRUB as a bootloader.
-The rest of the code is extracted from some of my older projects.
+And the multiboot.h is not my code.
+Most of the code is ~~stolen~~ adapted from older osdev projects.
