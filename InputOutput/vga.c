@@ -344,7 +344,9 @@ void vga_print(unsigned char c, int x, int y, int co, int co2)
 int keyx, keyy;
 void vga_scroll()
 {
-	
+	vga_cls(color2);
+    keyx = 0;
+	keyy = 0;
 }
 void vga_rectfill(int x1, int y1, int x2, int y2, int c)
 {
@@ -372,18 +374,13 @@ void vga_printc(int key)
 	{
 		keyy = keyy + 8;
 		if (keyy == 200)
-		{
-			vga_cls(color2);
-			keyy = 0;
-		}
+			vga_scroll();
 		keyx = 0;
 		return;
 	}
 	if (keyy == 200)
 	{
-		vga_cls(color2);
-		keyx = 0;
-		keyy = 0;
+		vga_scroll();
 		return;
 	}
 	vga_print(key, keyx, keyy, color, color2);
