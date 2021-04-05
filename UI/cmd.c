@@ -1,9 +1,9 @@
 #include "string.h"
 #include "inoutb.h"
-#define command_num 6
+#define command_num 8
 char* terminal_mode = "";
 char* commands[command_num] = {
-    "about", "cls", "echo", "help", "mouse", "reboot"
+    "about", "cls", "echo", "help", "mouse", "reboot", "serial", "vga"
 };
 char* cmd_notsplit = 0;
 char cmd_splote[10][20];
@@ -46,36 +46,41 @@ void help()
 #include "mouse.h"
 int x, y;
 char* blank = "        ";
+int (*getcolumn)();
+int (*getrow)();
+#include "serial.h"
 void mouse_local(uint8_t b1, uint8_t b2, uint8_t b3)
 {
-    int c = text_get_column();
-    int r = text_get_row();
-    setpos(5, 72);
+    int c = getcolumn();
+    int r = getrow();
+    fgbg(1, 4);
+    setpos(5, 32);
     if (b1 & 0x80 || b1 & 0x40)
     {
         prints("OVERFLOW");
         setpos(r, c);
+        fgbg(7, 4);
         return;
     }
     else
         prints(blank);
-    setpos(0, 72);
+    setpos(0, 32);
     prints(blank);
-    setpos(1, 72);
+    setpos(1, 32);
     prints(blank);
-    setpos(2, 72);
+    setpos(2, 32);
     prints(blank);
     char* itoa = 0;
     string_itoa(b1, itoa, 2);
-    setpos(0, 69);
+    setpos(0, 29);
     prints("p1:");
     prints(itoa);
     string_itoa(b2, itoa, 2);
-    setpos(1, 69);
+    setpos(1, 29);
     prints("p2:");
     prints(itoa);
     string_itoa(b3, itoa, 2);
-    setpos(2, 69);
+    setpos(2, 29);
     prints("p3:");
     prints(itoa);
     unsigned int mouse_x = 0, mouse_y = 0;
@@ -96,13 +101,19 @@ void mouse_local(uint8_t b1, uint8_t b2, uint8_t b3)
     else if (y > 400)
         y = 400;
     string_itoa(x, itoa, 10);
-    setpos(3, 69);
+    setpos(3, 29);
     prints("mX:");
     prints(itoa);
     string_itoa(y, itoa, 10);
-    setpos(4, 69);
+    setpos(4, 29);
     prints("mY:");
     prints(itoa);
+    serial_prints("mX:");
+    serial_printd(x);
+    serial_prints("\nmY:");
+    serial_printd(y);
+    serial_printc('\n');
+    fgbg(7, 4);
     setpos(r, c);
 }
 int mouse_running = 0;
@@ -119,7 +130,6 @@ void mouse()
         mouse_setout(0);
         mouse_running = 0;
     }
-    printc('\n');
 }
 void reboot()
 {
@@ -133,8 +143,19 @@ halt:
     __asm__ volatile ("hlt");
     goto halt;
 }
+void serial()
+{
+    serial_init();
+    prints("\nSerial enabled!\n");
+    serial_prints("Serial enabled!");
+}
+#include "vga.h"
+void vga()
+{
+    vga_init();
+}
 void* commandptr[command_num] = {
-    about, cls, echo, help, mouse, reboot
+    about, cls, echo, help, mouse, reboot, serial, vga
 };
 void cmd_clear()
 {
@@ -172,6 +193,8 @@ void cmd_run(char* command)
     cmd_notsplit = command;
     cmd_split(cmd_notsplit);
     string_tolower(cmd_splote[0]);
+    serial_prints("This command was attemped:");
+    serial_prints(command);
     for (int i = 0; i < command_num; i++)
     {
         if (string_cmp(cmd_splote[0], commands[i]))
@@ -197,4 +220,9 @@ void cmd_ptr(void* pc, void* ps, void* fb, void* pos)
     prints = ps;
     fgbg = fb;
     setpos = pos;
+}
+void cmd_getposptr(int (*getr)(), int (*getc)())
+{
+    getrow = getr;
+    getcolumn = getc;
 }

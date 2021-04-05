@@ -50,6 +50,7 @@ void cmd()
     text_setfgbg(7, 4);
     cmd_mode("Text Mode");
     term_ptr(text_printc, text_prints, text_setfgbg, text_setpos);
+    cmd_getposptr(text_get_row, text_get_column);
     keyboard_listener(term_keyin);
 }
 void main(void)

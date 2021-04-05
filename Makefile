@@ -1,6 +1,7 @@
 PREFIX=~/opt/cross/bin/i686-elf
 FLAGS=-m32 -ffreestanding -std=gnu99 -O2 -Wall -Wextra
 INC="Headers"
+QEMU=-m 2G -serial file:out.log
 
 all: run
 
@@ -10,6 +11,12 @@ text.o: InputOutput/text.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
 
 inout.o: InputOutput/inoutb.c
+	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
+
+vga.o: InputOutput/vga.c
+	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
+
+serial.o: InputOutput/serial.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
 
 intc.o: Interrupt/int.c
@@ -44,11 +51,11 @@ run: grub
 boot.o: GRUB/grub.asm
 	nasm $< -felf32 -o $@
 
-grub-kernel.bin: boot.o kernel.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o terminal.o cmd.o mouse.o
+grub-kernel.bin: boot.o kernel.o serial.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o terminal.o cmd.o mouse.o vga.o
 	$(PREFIX)-gcc -T GRUB/linker.ld -o $@ -I$(INC) -ffreestanding -O2 -nostdlib $^ -lgcc
 
 qemu-kernel: grub-kernel.bin
-	qemu-system-i386 -kernel $< -m 2G
+	qemu-system-i386 -kernel $< $(QEMU)
 	make clean
 
 R-OS.iso: grub-kernel.bin
@@ -57,11 +64,11 @@ R-OS.iso: grub-kernel.bin
 	cp GRUB/grub.cfg GRUB/iso/boot/grub/grub.cfg
 	grub-mkrescue -o R-OS.iso GRUB/iso
 	rm -r GRUB/iso
-	qemu-system-i386 -cdrom R-OS.iso -m 2G
+	qemu-system-i386 -cdrom R-OS.iso $(QEMU)
 	make clean
 	rm R-OS.iso
 
 grub: R-OS.iso
 
 clean:
-	$(RM) *.bin *.o
+	$(RM) *.bin *.o *.log
