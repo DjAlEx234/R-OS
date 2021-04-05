@@ -10,4 +10,4 @@ The roadmap for the future:
 Code source:
 Currently, I am using the help of GRUB as a bootloader.
 And the multiboot.h is not my code.
-Most of the code is ~~stolen~~ adapted from older osdev projects.
+Most of the code is ~~stolen~~ adapted from my own older osdev projects.

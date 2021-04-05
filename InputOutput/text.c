@@ -83,8 +83,14 @@ void text_prints(char* s)
     for (int i = 0; i < string_len(s); i++)
         text_printc(s[i]);
 }
+#include "inoutb.h"
 void text_init(void)
 {
     video_memory = (uint16_t*)0xB8000;
+    (void)inb(0x3DA);
+    outb(0x3C0, 0x30);
+    uint8_t in = inb(0x3C1);
+    in &= ~(1 << 3);
+    outb(0x3C0, in);//this disables blinking text
     text_clear(0);
 }
