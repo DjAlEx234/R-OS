@@ -65,6 +65,8 @@ R-OS.iso: grub-kernel.bin
 	grub-mkrescue -o R-OS.iso GRUB/iso
 	rm -r GRUB/iso
 	qemu-system-i386 -cdrom R-OS.iso $(QEMU)
+	rm /media/sf_vm/R-OS.iso
+	cp R-OS.iso /media/sf_vm/R-OS.iso
 	make clean
 	rm R-OS.iso
 
