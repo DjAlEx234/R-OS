@@ -43,6 +43,9 @@ terminal.o: UI/terminal.c
 cmd.o: UI/cmd.c
 	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
 
+interface.o: UI/interface.c
+	$(PREFIX)-gcc $(FLAGS) -c $< -o $@ -I$(INC)
+
 intasm.o: Interrupt/int.asm
 	nasm $< -felf32 -o $@
 
@@ -51,7 +54,7 @@ run: grub
 boot.o: GRUB/grub.asm
 	nasm $< -felf32 -o $@
 
-grub-kernel.bin: boot.o kernel.o serial.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o terminal.o cmd.o mouse.o vga.o
+grub-kernel.bin: boot.o kernel.o serial.o text.o intasm.o intc.o inout.o string.o cpuid.o keyboard.o terminal.o cmd.o vga.o interface.o mouse.o
 	$(PREFIX)-gcc -T GRUB/linker.ld -o $@ -I$(INC) -ffreestanding -O2 -nostdlib $^ -lgcc
 
 qemu-kernel: grub-kernel.bin
@@ -64,9 +67,9 @@ R-OS.iso: grub-kernel.bin
 	cp GRUB/grub.cfg GRUB/iso/boot/grub/grub.cfg
 	grub-mkrescue -o R-OS.iso GRUB/iso
 	rm -r GRUB/iso
-	qemu-system-i386 -cdrom R-OS.iso $(QEMU)
 	rm /media/sf_vm/R-OS.iso
 	cp R-OS.iso /media/sf_vm/R-OS.iso
+	qemu-system-i386 -cdrom R-OS.iso $(QEMU)
 	make clean
 	rm R-OS.iso
 

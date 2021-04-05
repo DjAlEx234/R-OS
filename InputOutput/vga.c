@@ -1,21 +1,6 @@
-#include "inoutb.h"
-unsigned char vga_registers[] =
-{
-	0x63,
-	0x03, 0x01, 0x0F, 0x00, 0x0E,
-	0x5F, 0x4F, 0x50, 0x82, 0x54, 0x80, 0xBF, 0x1F,
-	0x00, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x9C, 0x0E, 0x8F, 0x28,	0x40, 0x96, 0xB9, 0xA3,
-	0xFF,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F,
-	0xFF,
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-	0x41, 0x00, 0x0F, 0x00,	0x00
-};//320x200x256
 unsigned char vga_font[2048] =
 {
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x7E, 0x81, 0xA5, 0x81, 0xBD, 0x99, 0x81, 0x7E,
 	0x7E, 0xFF, 0xDB, 0xFF, 0xC3, 0xE7, 0xFF, 0x7E,
 	0x6C, 0xFE, 0xFE, 0xFE, 0x7C, 0x38, 0x10, 0x00,
@@ -271,58 +256,81 @@ unsigned char vga_font[2048] =
 	0x70, 0x98, 0x30, 0x60, 0xF8, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x3C, 0x3C, 0x3C, 0x3C, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};//font i took ;p
-void vga_set(unsigned char *registers)
+};
+int width = 320;
+int height = 200;
+int color, color2;
+#include "inoutb.h"
+unsigned char gdump[] =
 {
-    int i;
-    outb(0x3C2, *registers);
-    registers++;
-    for (i = 0; i < 5; i++)
-    {
-        outb(0x3C4, i);
-        outb(0x3C5, *registers);
-        registers++;
-    }
-    outb(0x3D4, 0x03);
-    outb(0x3D5, inb(0x3D5) | 0x80);
-    outb(0x3D4, 0x11);
-    outb(0x3D5, inb(0x3D5) & ~0x80);
-    registers[0x03] |= 0x80;
-	registers[0x11] &= ~0x80;
-    for(i = 0; i < 25; i++)
+	0x63, 0x03, 0x01, 0x0F, 0x00, 0x0E, 0x5F, 0x4F, 
+	0x50, 0x82, 0x54, 0x80, 0xBF, 0x1F, 0x00, 0x41, 
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x9C, 0x0E, 
+	0x8F, 0x28,	0x40, 0x96, 0xB9, 0xA3, 0xFF, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F, 0xFF,
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+	0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+	0x41, 0x00, 0x0F, 0x00,	0x00
+};
+void vga_set(unsigned char *dump)
+{
+	unsigned int i;
+	outb(0x3C2, *dump);
+	dump++;
+	for(i = 0; i < 5; i++)
+	{
+		outb(0x3C4, i);
+		outb(0x3C5, *dump);
+		dump++;
+	}
+	outb(0x3D4, 0x03);
+	outb(0x3D5, inb(0x3D5) | 0x80);
+	outb(0x3D4, 0x11);
+	outb(0x3D5, inb(0x3D5) & ~0x80);
+	dump[0x03] |= 0x80;
+	dump[0x11] &= ~0x80;
+	for(i = 0; i < 25; i++)
 	{
 		outb(0x3D4, i);
-		outb(0x3D5, *registers);
-		registers++;
+		outb(0x3D5, *dump);
+		dump++;
 	}
 	for(i = 0; i < 9; i++)
 	{
 		outb(0x3CE, i);
-		outb(0x3CF, *registers);
-		registers++;
+		outb(0x3CF, *dump);
+		dump++;
 	}
 	for(i = 0; i < 21; i++)
 	{
 		(void)inb(0x3DA);
 		outb(0x3C0, i);
-		outb(0x3C0, *registers);
-		registers++;
+		outb(0x3C0, *dump);
+		dump++;
 	}
 	(void)inb(0x3DA);
 	outb(0x3C0, 0x20);
 }
+unsigned char* vga_memory = (unsigned char*)0xA0000;
+int buffer[320][200];
 void vga_setp(int x, int y, int c)
 {
-    unsigned char* where = (unsigned char*)0xA0000 + 320 * y + x;
-    *where = c;
+	if (x > 320 || x < 0 || y > 200 || y < 0 || c > 256)
+		return;
+	buffer[x][y] = c;
 }
-int color, color2;
 void vga_cls(int c)
 {
-    for (int x = 0; x < 320; x++)
-        for (int y = 0; y < 200; y++)
+    for (int x = 0; x < width; x++)
+        for (int y = 0; y < height; y++)
             vga_setp(x, y, c);
     color2 = c;
+}
+void vga_writebuffer()
+{
+	for (int y = 0; y < height; y++)
+		for (int x = 0; x < width; x++)
+			vga_memory[width * y + x] = buffer[x][y];
 }
 void vga_print(unsigned char c, int x, int y, int co, int co2)
 {
@@ -348,54 +356,73 @@ void vga_scroll()
     keyx = 0;
 	keyy = 0;
 }
-void vga_rectfill(int x1, int y1, int x2, int y2, int c)
+void vga_rectfill(int x, int y, int width, int height, int c)
 {
-	for (int i = x1; i < x2; i++)
-		for (int j = y1; j < y2; j++)
+	for (int i = x; i < x + width; i++)
+		for (int j = y; j < y + height; j++)
 			vga_setp(i, j, c);
 }
 #include "serial.h"
 void vga_printc(int key)
 {
-    if (key == '\0')
+	if (key == '\0')
 		return;
 	if (key == '\b')
 	{
 		if (keyx == 0)
 		{
-			keyx = 320;
+			keyx = width;
 			keyy = keyy - 8;
 		}
 		keyx = keyx - 8;
 		vga_rectfill(keyx, keyy, keyx + 8, keyy + 8, color2);
+		vga_writebuffer();
 		return;
 	}
 	else if (key == '\n')
 	{
 		keyy = keyy + 8;
-		if (keyy == 200)
+		if (keyy == height)
 			vga_scroll();
 		keyx = 0;
+		vga_writebuffer();
 		return;
 	}
-	if (keyy == 200)
+	if (keyy == height)
 	{
 		vga_scroll();
+		vga_writebuffer();
 		return;
 	}
 	vga_print(key, keyx, keyy, color, color2);
 	keyx = keyx + 8;
-	if (keyx == 320)
+	if (keyx == width)
 	{
 		keyx = 0;
 		keyy = keyy + 8;
 	}
+	vga_writebuffer();
+}
+#include "interface.h"
+void vga_printc2(int key)
+{
+	if (interface_enabled())
+		return;
+	vga_printc(key);
+	vga_writebuffer();
 }
 #include "string.h"
 void vga_prints(char* str)
 {
 	for (int i = 0; i < string_len(str); i++)
         vga_printc(str[i]);
+}
+void vga_prints2(char* str)
+{
+	if (interface_enabled())
+		return;
+	vga_prints(str);
+	vga_writebuffer();
 }
 void vga_setfgbg(int fg, int bg)
 {
@@ -417,13 +444,20 @@ int vga_getc()
 }
 #include "terminal.h"
 #include "cmd.h"
+int enabled = 0;
+int vga_enabled()
+{
+	return enabled;
+}
 void vga_init()
 {
 	keyx = 0;
 	keyy = 0;
-	vga_set(vga_registers);
+	enabled = 1;
+	vga_set(gdump);
     vga_cls(4);
+	vga_writebuffer();
     cmd_mode("VGA Mode");
-    term_ptr(vga_printc, vga_prints, vga_setfgbg, vga_setpos);
+    term_ptr(vga_printc2, vga_prints2, vga_setfgbg, vga_setpos);
     cmd_getposptr(vga_getr, vga_getc);
 }

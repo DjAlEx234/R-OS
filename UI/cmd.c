@@ -1,9 +1,9 @@
 #include "string.h"
 #include "inoutb.h"
-#define command_num 8
+#define command_num 9
 char* terminal_mode = "";
 char* commands[command_num] = {
-    "about", "cls", "echo", "help", "mouse", "reboot", "serial", "vga"
+    "about", "cls", "echo", "help", "mouse", "reboot", "serial", "ui", "vga"
 };
 char* cmd_notsplit = 0;
 char cmd_splote[10][20];
@@ -11,6 +11,8 @@ void(*printc)(char c);
 void(*prints)(char* s);
 void(*setpos)(int r, int c);
 void(*fgbg)(int fg, int bg);
+int (*getcolumn)();
+int (*getrow)();
 void about()
 {
     prints("\nR-OS Pre-Alpha CLI\nRunning in: ");
@@ -43,12 +45,10 @@ void help()
     }
     printc('\n');
 }
+int mouse_running = 0;
 #include "mouse.h"
 int x, y;
 char* blank = "        ";
-int (*getcolumn)();
-int (*getrow)();
-#include "serial.h"
 void mouse_local(uint8_t b1, uint8_t b2, uint8_t b3)
 {
     int c = getcolumn();
@@ -108,28 +108,25 @@ void mouse_local(uint8_t b1, uint8_t b2, uint8_t b3)
     setpos(4, 29);
     prints("mY:");
     prints(itoa);
-    serial_prints("mX:");
-    serial_printd(x);
-    serial_prints("\nmY:");
-    serial_printd(y);
-    serial_printc('\n');
     fgbg(7, 4);
     setpos(r, c);
 }
-int mouse_running = 0;
 void mouse()
 {
     cls();
     if (mouse_running == 0)
     {
-        mouse_setout(*mouse_local);
         mouse_running = 1;
+        mouse_setout(mouse_local);
+        prints("Mouse Enabled!");
     }
     else
     {
-        mouse_setout(0);
         mouse_running = 0;
+        mouse_setout(0);
+        prints("Mouse Disabled!");
     }
+    printc('\n');
 }
 void reboot()
 {
@@ -143,6 +140,7 @@ halt:
     __asm__ volatile ("hlt");
     goto halt;
 }
+#include "serial.h"
 void serial()
 {
     serial_init();
@@ -150,12 +148,29 @@ void serial()
     serial_prints("Serial enabled!");
 }
 #include "vga.h"
+#include "interface.h"
+void ui()
+{
+    if (!vga_enabled())
+    {
+        prints("\nMust be ran in VGA mode!\n");
+        return;
+    }
+    else if (!mouse_running)
+    {
+        prints("\nMust be ran with mouse enabled!\n");
+        return;
+    }
+    mouse_setout(interface_mouseint);
+    interface_init();
+    interface_draw();
+}
 void vga()
 {
     vga_init();
 }
 void* commandptr[command_num] = {
-    about, cls, echo, help, mouse, reboot, serial, vga
+    about, cls, echo, help, mouse, reboot, serial, ui, vga
 };
 void cmd_clear()
 {
@@ -202,6 +217,7 @@ void cmd_run(char* command)
             void(*v)() = commandptr[i];
             fgbg(10, 4);
             v();
+            cmd_clear();
             return;
         }
     }
